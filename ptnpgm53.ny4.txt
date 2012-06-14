@@ -1,0 +1,34 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	new file:   Autosave/autosave_2012-06-14_14-15-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_14-30-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_14-45-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_15-00-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_15-15-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_15-30-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_15-45-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_16-00-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_16-15-11.autoplay
+#	new file:   Autosave/autosave_2012-06-14_16-30-11.autoplay
+#	new file:   CD_Root/AdbWinApi.dll
+#	new file:   CD_Root/AdbWinUsbApi.dll
+#	new file:   CD_Root/AutoPlay/Audio/Click1.ogg
+#	new file:   CD_Root/AutoPlay/Audio/High1.ogg
+#	new file:   CD_Root/AutoPlay/Buttons/0001-windows-7.btn
+#	new file:   CD_Root/AutoPlay/Plugins/Clipboard/CommandLine/CommandLine.lmd
+#	new file:   CD_Root/AutoPlay/Plugins/Office2007.cjstyles
+#	new file:   CD_Root/AutoPlay/Plugins/sb_Windows7.png
+#	new file:   CD_Root/AutoPlay/autorun.cdd
+#	new file:   CD_Root/adb.exe
+#	new file:   CD_Root/autorun.exe
+#	new file:   CD_Root/fastboot.exe
+#	new file:   CD_Root/lua5.1.dll
+#	new file:   CD_Root/lua51.dll
+#
+Started developing
+
