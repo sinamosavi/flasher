@@ -280,15 +280,28 @@ Label.SetProperties("Label3", tLabel3);
 
 end
 
+if (connected==true) then
 
+ unlocked = CommandLine.Execute("fastboot getvar unlocked", 4000);
+ search2 = String.Find(unlocked.StdError, "yes", 1, false);
+
+ if (search2==-1) then
+  bootloader = Dialog.Message("Warning", "We have found that your bootloader is locked. Do you wonna unlock it?", MB_YESNO, MB_ICONINFORMATION, MB_DEFBUTTON1);
+  Dialog.Message("a",bootloader)
+  if (bootloader==6) then
+   CommandLine.Execute("fastboot oem unlock", 4000);
+  end
+ end
+ 
+end
 </Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>41</DesignCodeLine>
+<DesignCodeCol>19</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
