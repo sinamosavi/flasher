@@ -59,7 +59,7 @@
 <ShuffleMode>0</ShuffleMode>
 <Repeat>1</Repeat>
 <BackVolume>255</BackVolume>
-<EffectsVolume>255</EffectsVolume>
+<EffectsVolume>0</EffectsVolume>
 <Tracks/>
 </AudioBGMusic>
 <Globals>
@@ -99,14 +99,25 @@ function Fastboot()
  return fastboot
 end
 
-
+function CheckBootloader()
+ if (connected==true) then
+  unlocked=CommandLine.Execute("fastboot getvar unlocked", 0);
+  unlocked = String.Find(unlocked.StdError, "yes", 1, false);
+  if (unlocked~=-1) then
+   unlocked=true
+  else
+   unlocked=false
+  end
+  return unlocked
+ end
+end
 
 
 </Script>
 <BookMarks count="0">
 </BookMarks>
 <DesignCodeLine>39</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeCol>42</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -2461,7 +2472,7 @@ xButton.SetEnabled("xButton6", true);
 <Actions/>
 <PLUGIN>
 <DLLFile>GroupBox\GroupBox.apo</DLLFile>
-<CustomData>0,0,Files,0,0,219813568,Segoe UI,9,0,0,0,0</CustomData>
+<CustomData>0,0,Files,0,0,182195904,Segoe UI,9,0,0,0,0</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -2551,7 +2562,7 @@ xButton.SetEnabled("xButton6", true);
 <Actions/>
 <PLUGIN>
 <DLLFile>GroupBox\GroupBox.apo</DLLFile>
-<CustomData>0,0,Image,0,0,219813592,Segoe UI,9,0,0,0,0</CustomData>
+<CustomData>0,0,Image,0,0,182195928,Segoe UI,9,0,0,0,0</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -2764,7 +2775,7 @@ xButton.SetEnabled("xButton6", true);
 <Actions/>
 <PLUGIN>
 <DLLFile>GroupBox\GroupBox.apo</DLLFile>
-<CustomData>0,0,Log,0,0,219813616,Segoe UI,9,0,0,0,0</CustomData>
+<CustomData>0,0,Log,0,0,182195952,Segoe UI,9,0,0,0,0</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -3094,7 +3105,7 @@ xButton.SetEnabled("xButton6", true);
 <Actions/>
 <PLUGIN>
 <DLLFile>GroupBox\GroupBox.apo</DLLFile>
-<CustomData>0,0,Options,0,0,219813640,Segoe UI,9,0,0,0,0</CustomData>
+<CustomData>0,0,Options,0,0,182195976,Segoe UI,9,0,0,0,0</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -3260,7 +3271,11 @@ if (connected~=true) then
  AddLog("You haven't plugged your device in.");
 end
 
-if (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButton1")==true) then
+if (CheckBootloader()==false) then
+ AddLog("You haven't unlocked the bootloader of your device.");
+end
+
+if (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButton1")==true and CheckBootloader()==true) then
 
  fastboot=Fastboot()
  if (selected1==true) then
@@ -3288,6 +3303,11 @@ if (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButt
   Folder.Create(_TempFolder.."/Flasher");
   CommandLine.Execute("7za x -o".._TempFolder.."/Flasher "..kernel[1], 0);
   zimage = File.Find(_TempFolder.."\\Flasher", "zImage", true, false, nil, nil);
+  if (zimage == nil) then
+   AddLog("This zip doesn't contain a zImage");
+   AddLog("Flashing stopped");
+   Application.ExitScript();
+  end
   zimage = zimage[1]
   CommandLine.Execute(fastboot.." flash zimage "..zimage, 0);
   AddLog("Flashed kernel successfully.");
@@ -3298,6 +3318,7 @@ if (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButt
   AddLog("Flashed kernel successfully.");
  else
   AddLog("Unknown type for kernel...");
+  AddLog("Flashing stopped.");
  end
  
  --Finish flash
@@ -3338,16 +3359,18 @@ if (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButt
  end
   
 
-elseif (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButton2")==true) then 
+elseif (connected==true and anyselected~=false and RadioButton.GetChecked("RadioButton2")==true and CheckBootloader()==true ) then 
  fastboot=Fastboot()
  
  --Start image flashing algorithm
-  AddLog("Flashing image..."); 
+  AddLog("Flashing image...");
+  AddLog("Extrecting image file..."); 
   CommandLine.Execute("7za x -o".._TempFolder.."/Flasher "..image[1], 0);
   tgz = String.SplitPath(image[1]);
   imagename = tgz.Filename
   tar2 = String.Replace(tgz.Filename..tgz.Extension, "tgz", "tar", false);
   tar = _TempFolder.."/Flasher/"..tar2
+  AddLog("Extrecting zip file...");
   CommandLine.Execute("7za x -o".._TempFolder.."/Flasher "..tar, 0);
   folder = String.Left(imagename, 12);
   radio2 = File.Find(_TempFolder.."/Flasher/"..folder, "radio*.img", true, false, nil, nil);
@@ -3358,7 +3381,8 @@ elseif (connected==true and anyselected~=false and RadioButton.GetChecked("Radio
   CommandLine.Execute(fastboot.." flash bootloader "..bootloader2[1], 0);
   zipimage=_TempFolder.."/Flasher/"..folder.."/image-"..folder..".zip"
   AddLog("Flashing main files...");
-  CommandLine.Execute("fastboot -w update "..zipimage, 0);
+  AddLog("You may exprience some hangs now, be patient and don't close the app...");
+  imageflashing=CommandLine.Execute("fastboot -w update "..zipimage, 0);
   AddLog("Flashed image successfully.");
  --Finish image flashing algorithm
 end
@@ -3368,8 +3392,8 @@ end
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>84</DesignCodeLine>
-<DesignCodeCol>4</DesignCodeCol>
+<DesignCodeLine>119</DesignCodeLine>
+<DesignCodeCol>78</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3697,7 +3721,7 @@ selected7=false</Script>
 <Actions/>
 <PLUGIN>
 <DLLFile>GroupBox\GroupBox.apo</DLLFile>
-<CustomData>0,0,Operation,0,0,219813664,Segoe UI,9,0,0,0,0</CustomData>
+<CustomData>0,0,Operation,0,0,182196000,Segoe UI,9,0,0,0,0</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -4083,7 +4107,7 @@ selected7=false</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Version 1.0.0</Body>
+<Body>Version 1.0.1</Body>
 <NormalColor>0</NormalColor>
 <HighlightColor>0</HighlightColor>
 <MouseDownColor>0</MouseDownColor>
@@ -4386,7 +4410,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <TimeStampFilesCDRW>0</TimeStampFilesCDRW>
 <TimeStampFilesISO>0</TimeStampFilesISO>
 <ISOImageFile/>
-<SelfExtractingZIPfile>C:\Users\Admin.Sina-PC.000\Documents\AutoPlay Media Studio 8\Output\GNFF.exe</SelfExtractingZIPfile>
+<SelfExtractingZIPfile>C:\Users\Admin.Sina-PC.000\Documents\AutoPlay Media Studio 8\Output\GNFF1.0.1.exe</SelfExtractingZIPfile>
 <ZIPMessage>Loading GNFF</ZIPMessage>
 <ZIPShowProgress>0</ZIPShowProgress>
 <CDVolumeIdentifier>NEWDISC</CDVolumeIdentifier>
